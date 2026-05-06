@@ -1,0 +1,773 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JobFit 求职面试 Agent</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">+</div>
+        <span>JobFit</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="doc-toggle-button" id="toggle-docs" type="button" aria-expanded="false">说明模式</button>
+        <button class="ghost-button" type="button">退出</button>
+      </div>
+    </header>
+
+    <main class="app-shell">
+      <section class="progress-strip" aria-label="流程进度">
+        <button class="step-pill active" data-step-target="job" type="button">
+          <span>1</span>
+          职位分析
+        </button>
+        <button class="step-pill locked" data-step-target="background" type="button">
+          <span>2</span>
+          完善背景
+        </button>
+        <button class="step-pill locked" data-step-target="ability" type="button">
+          <span>3</span>
+          能力分析
+        </button>
+        <button class="step-pill locked" data-step-target="practice" type="button">
+          <span>4</span>
+          模拟面试
+        </button>
+        <button class="step-pill locked" data-step-target="improve" type="button">
+          <span>5</span>
+          复盘提升
+        </button>
+      </section>
+
+      <section class="screen active" id="job-screen" aria-labelledby="job-title">
+        <div class="page-heading">
+          <p class="eyebrow">Step 1</p>
+          <h1 id="job-title">第 1 步 · 职位分析</h1>
+          <p>请输入目标职位信息，系统会判断信息是否足够，并生成职位能力模型。</p>
+        </div>
+
+        <article class="card input-card">
+          <div class="card-title-row">
+            <h2>目标岗位信息</h2>
+          </div>
+
+          <label class="field">
+            <span>目标职位 <strong>*</strong></span>
+            <input id="job-title-input" maxlength="80" placeholder="例如：AI 产品经理、Java 开发工程师、数据分析师" />
+          </label>
+
+          <label class="field">
+            <span>职位描述 JD</span>
+            <textarea id="job-jd-input" rows="4" placeholder="可粘贴岗位 JD，包含岗位职责、任职要求会提升分析准确度。"></textarea>
+          </label>
+
+          <div class="file-import-sep">或从文件导入</div>
+          <div class="file-import-row">
+            <button class="file-import-btn" id="jd-file-btn" type="button"><span class="fi-icon">&#128194;</span> 选择文件导入 JD</button>
+            <span class="file-import-hint">支持 PDF、Word (.docx)、TXT</span>
+            <input type="file" id="jd-file-input" accept=".pdf,.docx,.doc,.txt" style="display:none;" />
+          </div>
+          <div class="file-import-status hidden" id="jd-file-status"></div>
+
+          <div class="field-grid combo-grid">
+            <label class="field">
+              <span>所属行业 </span>
+              <div class="combo-wrap">
+                <input id="job-industry-input" class="combo-input" placeholder="选择或输入行业" autocomplete="off" />
+                <div class="combo-arrow">&#9662;</div>
+                <div class="combo-dropdown" data-for="job-industry-input">
+                  <div class="combo-option" data-value="互联网 / AI 工具">互联网 / AI 工具</div>
+                  <div class="combo-option" data-value="金融科技">金融科技</div>
+                  <div class="combo-option" data-value="教育">教育</div>
+                  <div class="combo-option" data-value="医疗健康">医疗健康</div>
+                  <div class="combo-option" data-value="电商零售">电商零售</div>
+                  <div class="combo-option" data-value="企业服务 / SaaS">企业服务 / SaaS</div>
+                </div>
+              </div>
+            </label>
+            <label class="field">
+              <span>职能方向 </span>
+              <div class="combo-wrap">
+                <input id="job-direction-input" class="combo-input" placeholder="选择或输入方向" autocomplete="off" />
+                <div class="combo-arrow">&#9662;</div>
+                <div class="combo-dropdown" data-for="job-direction-input">
+                  <div class="combo-option" data-value="AI 产品">AI 产品</div>
+                  <div class="combo-option" data-value="B 端产品">B 端产品</div>
+                  <div class="combo-option" data-value="增长产品">增长产品</div>
+                  <div class="combo-option" data-value="策略产品">策略产品</div>
+                  <div class="combo-option" data-value="数据产品">数据产品</div>
+                  <div class="combo-option" data-value="用户研究">用户研究</div>
+                </div>
+              </div>
+            </label>
+            <label class="field">
+              <span>工作年限 / 职级 </span>
+              <div class="combo-wrap">
+                <input id="job-level-input" class="combo-input" placeholder="选择或输入年限" autocomplete="off" />
+                <div class="combo-arrow">&#9662;</div>
+                <div class="combo-dropdown" data-for="job-level-input">
+                  <div class="combo-option" data-value="应届 / 实习">应届 / 实习</div>
+                  <div class="combo-option" data-value="1-3 年">1-3 年</div>
+                  <div class="combo-option" data-value="3-5 年">3-5 年</div>
+                  <div class="combo-option" data-value="5-10 年">5-10 年</div>
+                  <div class="combo-option" data-value="10 年以上">10 年以上</div>
+                </div>
+              </div>
+            </label>
+          </div>
+
+          <label class="field">
+            <span>其他补充 </span>
+            <input id="job-extra-input" placeholder="例如：偏策略、偏落地、需要带团队" />
+          </label>
+
+          <button class="primary-button" id="generate-job" type="button">生成职位能力模型</button>
+        </article>
+
+        <article class="card progress-card hidden" id="job-loading">
+          <div class="streaming-header">
+            <div class="streaming-header-left">
+              <div class="streaming-dot"></div>
+              <h2>AI 正在分析职位</h2>
+            </div>
+          </div>
+          <div class="streaming-body">
+            <div class="stream-steps" id="stream-steps"></div>
+            <div class="stream-content" id="stream-content">正在等待 AI 返回分析内容...</div>
+            <div class="stream-cursor" id="stream-cursor"><span class="cursor-blink"></span></div>
+            <div class="stream-progress" id="stream-progress">
+              <div class="stream-progress-bar"><div class="stream-progress-fill" id="stream-progress-fill"></div></div>
+              <div class="stream-progress-text" id="stream-progress-text">正在思考...</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card warning-card hidden" id="job-clarify">
+          <div class="card-title-row">
+            <div>
+              <h2>需要补充的信息</h2>
+              <p>这个职位方向还不够清晰，暂时无法生成准确的职位能力模型。</p>
+            </div>
+            <span class="status-badge warning">未生成</span>
+          </div>
+          <div class="question-list">
+            <div>你更关注哪个行业或业务场景？</div>
+            <div>这个岗位偏策略、增长、B 端还是 AI 产品？</div>
+            <div>目标岗位大概是初级、中级还是高级？</div>
+          </div>
+          <label class="field">
+            <span>补充回答</span>
+            <textarea id="job-supplement" rows="3" placeholder="例如：我想准备 AI 工具方向的中级产品经理，偏 B 端 SaaS 场景。"></textarea>
+          </label>
+          <button class="primary-button" id="retry-job" type="button">更新并生成职位能力模型</button>
+        </article>
+
+        <article class="card result-card hidden" id="job-result">
+          <div class="card-title-row">
+            <div>
+              <h2>职位能力模型</h2>
+              <p id="job-result-subtitle">目标职位已确认</p>
+            </div>
+            <button class="link-button" id="edit-job" type="button">编辑</button>
+          </div>
+
+          <div class="result-grid">
+            <div class="result-block wide">
+              <div class="result-block-label">核心职责</div>
+              <ul></ul>
+            </div>
+            <div class="result-block">
+              <div class="result-block-label">核心能力</div>
+              <div class="clean-ability-list" id="job-core-abilities"></div>
+            </div>
+            <div class="result-block">
+              <div class="result-block-label">关键技能</div>
+              <div class="clean-keyword-list" id="job-key-skills"></div>
+            </div>
+            <div class="result-block wide">
+              <div class="result-block-label">面试关注点</div>
+              <div class="clean-focus-list" id="job-interview-focus"></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="next-panel disabled" id="job-next-panel">
+          <div>
+            <h2>下一步：完善个人背景</h2>
+            <p>生成职位能力模型后，补充你的经历，进行能力差距分析。</p>
+          </div>
+          <button class="success-button" id="go-background" type="button" disabled>去完善个人背景 →</button>
+        </article>
+      </section>
+
+      <section class="screen" id="background-screen" aria-labelledby="background-title">
+        <div class="page-heading">
+          <p class="eyebrow">Step 2</p>
+          <h1 id="background-title">填写背景</h1>
+        </div>
+
+        <article class="card compact-summary hidden" id="job-summary">
+          <div>
+            <h2>目标职位已确认</h2>
+            <p id="job-summary-text">AI 产品经理 · 已生成职位能力模型</p>
+          </div>
+          <button class="link-button" data-step-target="job" type="button">返回编辑</button>
+        </article>
+
+        <article class="card input-card">
+          <div class="card-title-row">
+            <h2>个人背景</h2>
+          </div>
+
+          <label class="field">
+            <span>自我介绍</span>
+            <textarea id="self-intro-input" rows="3" placeholder="简要介绍你的职业背景、核心能力和求职方向。"></textarea>
+          </label>
+
+          <label class="field">
+            <span>工作经历</span>
+            <textarea id="work-input" rows="4" placeholder="描述你的工作经历、职责、产出结果，以及与目标岗位相关的能力。"></textarea>
+          </label>
+
+          <label class="field">
+            <span>项目经历</span>
+            <textarea id="project-input" rows="4" placeholder="描述一个最能代表你能力的项目，包括背景、职责、行动和结果。"></textarea>
+          </label>
+
+          <div class="file-import-row">
+            <button class="file-import-btn" id="resume-file-btn" type="button"><span class="fi-icon">&#128194;</span> 选择简历文件</button>
+            <span class="file-import-hint">支持 PDF、Word (.docx)、TXT</span>
+            <input type="file" id="resume-file-input" accept=".pdf,.docx,.doc,.txt" style="display:none;" />
+          </div>
+          <div class="file-import-status hidden" id="resume-file-status"></div>
+
+          <button class="primary-button" id="generate-profile" type="button">生成个人能力画像</button>
+        </article>
+
+        <article class="card streaming-card hidden" id="profile-loading">
+          <div class="streaming-header">
+            <div class="streaming-header-left">
+              <div class="streaming-dot"></div>
+              <h2>AI 正在分析个人背景</h2>
+            </div>
+          </div>
+          <div class="streaming-body" id="profile-stream-body">
+            <div class="stream-steps" id="profile-stream-steps"></div>
+            <div class="stream-content" id="profile-stream-content"></div>
+            <div class="stream-cursor" id="profile-stream-cursor"><span class="cursor-blink"></span></div>
+            <div class="stream-progress" id="profile-stream-progress">
+              <div class="stream-progress-bar"><div class="stream-progress-fill" id="profile-stream-fill"></div></div>
+              <div class="stream-progress-text" id="profile-stream-text">正在思考...</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card warning-card hidden" id="profile-clarify">
+          <div class="card-title-row">
+            <div>
+              <h2>需要补充的信息</h2>
+              <p>还差一点信息，暂时无法生成准确的能力画像。</p>
+            </div>
+          </div>
+          <div class="question-list">
+            <div>你做过什么具体项目？</div>
+            <div>你在项目中主要负责什么？</div>
+            <div>有没有结果、数据或产出？</div>
+          </div>
+          <label class="field">
+            <span>补充回答</span>
+            <textarea id="profile-supplement" rows="3" placeholder="例如：项目上线后帮助团队把需求整理时间缩短 30%，我主要负责调研、PRD 和推进。"></textarea>
+          </label>
+          <button class="primary-button" id="retry-profile" type="button">更新并生成能力画像</button>
+        </article>
+
+        <article class="card result-card hidden" id="profile-result">
+          <div class="card-title-row">
+            <div>
+              <h2>个人能力画像</h2>
+              <p id="profile-result-summary"></p>
+            </div>
+            <button class="link-button" id="edit-profile" type="button">编辑</button>
+          </div>
+
+          <div class="profile-summary" id="profile-meta-area"></div>
+
+          <div class="profile-grid">
+            <div class="profile-block">
+              <div class="profile-block-label">核心能力</div>
+              <div class="clean-ability-list profile" id="profile-abilities"></div>
+            </div>
+            <div class="profile-block">
+              <div class="profile-block-label">优势能力</div>
+              <ul class="profile-list" id="profile-strengths"></ul>
+            </div>
+            <div class="profile-block">
+              <div class="profile-block-label">可迁移能力</div>
+              <div class="clean-keyword-list" id="profile-transferable"></div>
+            </div>
+            <div class="profile-block">
+              <div class="profile-block-label">可能薄弱项</div>
+              <div class="clean-warning-list" id="profile-weak"></div>
+            </div>
+            <div class="profile-block wide">
+              <div class="profile-block-label">可用于面试的项目经历</div>
+              <ul class="profile-list" id="profile-cases"></ul>
+            </div>
+          </div>
+        </article>
+
+        <article class="next-panel disabled" id="profile-next-panel">
+          <div>
+            <h2>下一步：查看能力匹配</h2>
+            <p>生成能力画像后，将与岗位能力模型对比，识别匹配点与差距点。</p>
+          </div>
+          <button class="success-button" id="go-ability" type="button" disabled>去查看能力匹配 →</button>
+        </article>
+      </section>
+
+      <section class="screen" id="ability-screen" aria-labelledby="ability-title">
+        <div class="page-heading">
+          <p class="eyebrow">Step 3</p>
+          <h1 id="ability-title">能力差距分析</h1>
+        </div>
+
+        <div class="prereq-grid" id="prereq-grid">
+          <div class="prereq-card" id="prereq-job">
+            <div class="prereq-card-header">
+              <div class="prereq-icon blue">&#128188;</div>
+              <div><div class="prereq-title">目标岗位能力模型</div><div class="prereq-sub" id="prereq-job-sub"></div></div>
+            </div>
+            <div class="prereq-section"><div class="prereq-label"><span class="pi">&#128203;</span> 核心职责</div><ul class="prereq-list clean" id="prereq-job-resp"></ul></div>
+            <div class="prereq-section"><div class="prereq-label"><span class="pi">&#127919;</span> 核心能力</div><div class="prereq-ability-list" id="prereq-job-abilities"></div></div>
+            <div class="prereq-section"><div class="prereq-label"><span class="pi">&#128295;</span> 关键技能</div><div class="prereq-keywords" id="prereq-job-skills"></div></div>
+          </div>
+          <div class="prereq-card" id="prereq-profile">
+            <div class="prereq-card-header">
+              <div class="prereq-icon green">&#128100;</div>
+              <div><div class="prereq-title">当前个人能力画像</div><div class="prereq-sub" id="prereq-profile-sub"></div></div>
+            </div>
+            <div class="prereq-section"><div class="prereq-label"><span class="pi">&#127919;</span> 核心能力</div><div class="prereq-ability-list profile" id="prereq-profile-abilities"></div></div>
+            <div class="prereq-section"><div class="prereq-label"><span class="pi">&#128170;</span> 优势能力</div><ul class="prereq-list clean" id="prereq-profile-strengths"></ul></div>
+            <div class="prereq-section"><div class="prereq-label"><span class="pi">&#9888;&#65039;</span> 薄弱项</div><div class="prereq-warning-list" id="prereq-profile-weak"></div></div>
+          </div>
+        </div>
+
+        <div id="ability-ready">
+          <button class="primary-button" id="generate-gap" type="button">生成能力差距分析</button>
+        </div>
+
+        <article class="card streaming-card hidden" id="ability-loading">
+          <div class="streaming-header">
+            <div class="streaming-header-left"><div class="streaming-dot"></div><h2>AI 正在分析能力差距</h2></div>
+          </div>
+          <div class="streaming-body">
+            <div class="stream-steps" id="gap-stream-steps"></div>
+            <div class="stream-content" id="gap-stream-content"></div>
+            <div class="stream-cursor" id="gap-stream-cursor"><span class="cursor-blink"></span></div>
+            <div class="stream-progress" id="gap-stream-progress">
+              <div class="stream-progress-bar"><div class="stream-progress-fill" id="gap-stream-fill"></div></div>
+              <div class="stream-progress-text" id="gap-stream-text">正在思考...</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card warning-card hidden" id="ability-blocked">
+          <div class="card-title-row"><div><h2>暂时无法分析</h2><p>需要先完成职位分析和背景填写。</p></div></div>
+          <div class="action-row">
+            <button class="secondary-button" data-step-target="job" type="button">返回职位分析</button>
+            <button class="secondary-button" data-step-target="background" type="button">返回填写背景</button>
+          </div>
+        </article>
+
+        <article class="card hidden" id="gap-result">
+          <div class="card-header"><h2>能力差距分析</h2></div>
+
+          <div class="score-overview" id="score-overview">
+            <div class="score-ring">
+              <svg width="100" height="100" viewBox="0 0 100 100">
+                <circle class="score-ring-bg" cx="50" cy="50" r="42"/>
+                <circle class="score-ring-fill" id="score-ring-fill" cx="50" cy="50" r="42" stroke-dasharray="264" stroke-dashoffset="264"/>
+              </svg>
+              <div class="score-ring-text"><div class="score-ring-num" id="score-num">--</div><div class="score-ring-label">综合匹配</div></div>
+            </div>
+            <div class="score-dims" id="score-dims"></div>
+          </div>
+
+          <div class="gap-table-wrap">
+            <table class="gap-table">
+              <thead>
+                <tr>
+                  <th>能力项</th>
+                  <th>岗位要求</th>
+                  <th>你的现状</th>
+                  <th>匹配</th>
+                  <th>证据</th>
+                  <th>差距原因</th>
+                  <th>面试风险</th>
+                  <th>建议</th>
+                </tr>
+              </thead>
+              <tbody id="gap-table-body"></tbody>
+            </table>
+          </div>
+
+          <div class="focus-section" id="gap-focus"></div>
+          <div class="risk-section" id="gap-risk"></div>
+        </article>
+
+        <article class="next-panel disabled" id="gap-next-panel">
+          <div><h2>下一步：模拟面试</h2><p>题目会围绕能力差距生成。</p></div>
+          <button class="success-button" id="go-practice" type="button" disabled>开始模拟面试 &rarr;</button>
+        </article>
+      </section>
+
+      <section class="screen" id="practice-screen" aria-labelledby="practice-title">
+        <div class="page-heading">
+          <p class="eyebrow">Step 4</p>
+          <h1 id="practice-title">第 4 步 · 模拟面试</h1>
+          <p>选择练习题，完成文字回答，并查看实时答题建议与结构化思路。</p>
+        </div>
+
+        <article class="practice-workbench" aria-label="模拟面试工作台">
+          <aside class="practice-panel practice-left-panel">
+            <div class="panel-kicker-row">
+              <div>
+                <p class="eyebrow">Practice</p>
+                <h2>面试问题列表</h2>
+              </div>
+              <button class="icon-button" id="start-practice-round" type="button" aria-label="从第一题开始">
+                <span aria-hidden="true">▶</span>
+              </button>
+            </div>
+            <div class="practice-tabs" role="tablist" aria-label="面试题分类">
+              <button class="practice-tab active" data-question-scope="all" type="button">全部</button>
+              <button class="practice-tab" data-question-scope="recommended" type="button">能力提升</button>
+              <button class="practice-tab" data-question-scope="ability" type="button">专项能力</button>
+            </div>
+            <label class="ability-filter hidden" id="ability-filter-wrap">
+              <span>专项能力</span>
+              <select id="ability-filter"></select>
+            </label>
+            <div class="practice-question-list" id="practice-question-list"></div>
+          </aside>
+
+          <div class="practice-main-workspace">
+            <section class="practice-panel practice-center-panel" aria-labelledby="inline-question-title">
+              <div class="interview-topline">
+                <span class="live-status-dot" id="inline-progress">模拟面试 · 第 1 题</span>
+                <span class="practice-timer">建议回答 5-8 分钟</span>
+              </div>
+              <h2 id="inline-question-title">如何从 0 到 1 设计并验证一款 AI 产品的核心价值？</h2>
+              <div class="modal-question-meta" id="modal-question-meta">
+                <span>AI 产品理解</span>
+                <span>产品策略</span>
+                <span>用户验证</span>
+              </div>
+
+              <label class="field answer-field">
+                <span>文字回答</span>
+                <textarea id="answer-input" rows="8" placeholder="请写下你的真实回答。建议包含具体场景、你的关键动作，以及结果或指标。"></textarea>
+              </label>
+
+              <article class="inline-warning hidden" id="answer-clarify">
+                <strong>回答还不够具体，暂时无法生成有效点评。</strong>
+                <p>请至少补充一个真实项目、你的关键动作，以及结果或指标。</p>
+              </article>
+
+              <article class="inline-loading hidden" id="answer-loading">
+                <div class="spinner"></div>
+                <div class="answer-stream-wrap">
+                  <p>正在分析你的回答结构、岗位贴合度、案例具体性和结果证据...</p>
+                  <div class="stream-content answer-stream-content" id="answer-stream-content">正在等待 AI 返回点评内容...</div>
+                </div>
+              </article>
+
+              <article class="modal-review hidden" id="answer-review">
+                <div class="card-title-row">
+                  <div>
+                    <h3>回答点评</h3>
+                    <p>以下点评基于当前题目、岗位能力模型和你的能力差距生成。</p>
+                  </div>
+                  <span class="status-badge success">已点评</span>
+                </div>
+
+                <div class="score-grid">
+                  <div>
+                    <strong>72</strong>
+                    <span>结构清晰度</span>
+                    <p>有基本顺序，但验证步骤还可以更具体。</p>
+                  </div>
+                  <div>
+                    <strong>68</strong>
+                    <span>岗位贴合度</span>
+                    <p>能回应岗位要求，但缺少岗位语言。</p>
+                  </div>
+                  <div>
+                    <strong>55</strong>
+                    <span>案例具体性</span>
+                    <p>缺少真实项目、指标或用户反馈。</p>
+                  </div>
+                  <div>
+                    <strong>70</strong>
+                    <span>结果证据</span>
+                    <p>观点清楚，但需要用结果证明判断。</p>
+                  </div>
+                </div>
+
+                <div class="review-grid">
+                  <section class="result-section">
+                    <h3>主要问题</h3>
+                    <ul>
+                      <li>案例背景、个人动作或结果证据还不够具体</li>
+                    </ul>
+                  </section>
+                  <section class="result-section">
+                    <h3>优化建议</h3>
+                    <ul>
+                      <li>按背景、动作、结果补充一版更完整回答</li>
+                    </ul>
+                  </section>
+                </div>
+              </article>
+
+              <article class="answer-next-panel hidden" id="answer-next-panel">
+                <div>
+                  <h3>本题点评已完成</h3>
+                  <p>进入复盘提升页，查看本轮答题暴露出的主要问题和下一批练习方向。</p>
+                </div>
+                <button class="success-button hidden" id="go-improve" type="button">查看复盘提升</button>
+              </article>
+
+              <div class="modal-actions">
+                <button class="secondary-button" id="skip-practice" type="button">清空回答</button>
+                <button class="success-button hidden" id="next-question" type="button">下一题</button>
+                <button class="primary-button" id="submit-answer" type="button">提交回答</button>
+              </div>
+            </section>
+
+            <aside class="practice-panel practice-guide-panel">
+              <div class="panel-kicker-row">
+                <div>
+                  <p class="eyebrow">AI 面试官</p>
+                  <h2>实时教练</h2>
+                </div>
+              </div>
+              <section class="guide-section">
+                <h3>答题建议</h3>
+                <p id="guide-assessment">主要看你是否能把岗位能力落到真实案例和可验证结果上。</p>
+              </section>
+              <section class="guide-section">
+                <h3>本题考察能力</h3>
+                <div class="guide-skill-tags" id="guide-skill-tags">
+                  <span>AI 产品理解</span>
+                  <span>产品策略</span>
+                </div>
+              </section>
+              <section class="guide-section">
+                <h3>结构化思路参考</h3>
+                <p id="guide-framework">建议按 STAR 组织：背景、任务、行动、结果。</p>
+              </section>
+              <section class="guide-section answer-example">
+                <div class="guide-title-row">
+                  <h3>参考回答示例</h3>
+                </div>
+                <p id="guide-answer-example">选择左侧题目后，这里会生成一版更完整的回答示例。请结合你的真实经历改写。</p>
+              </section>
+            </aside>
+          </div>
+        </article>
+      </section>
+
+      <div class="modal-layer hidden" id="reference-modal" role="dialog" aria-modal="true" aria-labelledby="reference-modal-title">
+        <div class="modal-card reference-modal-card">
+          <div class="modal-header">
+            <div>
+              <p class="eyebrow" id="reference-modal-kicker">题型参考</p>
+              <h2 id="reference-modal-title">查看答题思路</h2>
+            </div>
+            <button class="icon-button" id="close-reference-modal" type="button" aria-label="关闭">×</button>
+          </div>
+          <div class="reference-modal-source" id="reference-modal-source"></div>
+          <div class="reference-modal-body" id="reference-modal-body"></div>
+          <div class="modal-actions">
+            <button class="secondary-button" id="close-reference-modal-bottom" type="button">关闭</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-layer hidden" id="practice-modal" role="dialog" aria-modal="true" aria-labelledby="modal-question-title">
+        <div class="modal-card">
+          <div class="modal-header">
+            <div>
+              <p class="eyebrow" id="modal-progress">模拟面试</p>
+              <h2 id="modal-question-title">如何从 0 到 1 设计并验证一款 AI 产品的核心价值？</h2>
+            </div>
+            <button class="icon-button" id="close-practice-modal" type="button" aria-label="关闭">×</button>
+          </div>
+          <div class="modal-actions">
+            <button class="secondary-button" id="close-practice-modal-bottom" type="button">关闭</button>
+          </div>
+        </div>
+      </div>
+
+      <section class="screen" id="improve-screen" aria-labelledby="improve-title">
+        <div class="page-heading">
+          <p class="eyebrow">Step 5</p>
+          <h1 id="improve-title">第 5 步 · 复盘提升</h1>
+          <p>汇总本轮练习表现，明确优先补强点，并生成下一轮练习计划。</p>
+        </div>
+
+        <article class="card warning-card hidden" id="improve-blocked">
+          <div class="card-title-row">
+            <div>
+              <h2>暂时无法生成复盘</h2>
+              <p>需要至少完成一道模拟题点评，系统才能基于真实回答生成复盘提升建议。</p>
+            </div>
+            <span class="status-badge warning">缺少练习结果</span>
+          </div>
+          <button class="secondary-button" data-step-target="practice" type="button">返回模拟面试</button>
+        </article>
+
+        <div id="improve-result">
+          <section class="review-hero-grid">
+            <article class="review-score-card">
+              <div class="review-card-head">
+                <div>
+                  <h2>本轮综合表现</h2>
+                  <p>按有效答题平均分计算。</p>
+                </div>
+                <span class="status-badge success" id="review-score-trend">已生成</span>
+              </div>
+              <div class="review-score-ring">
+                <div>
+                  <strong id="review-overall-score">--</strong>
+                  <span>综合得分</span>
+                </div>
+              </div>
+              <p class="review-score-copy" id="review-overall-summary">已根据本轮答题生成复盘。</p>
+            </article>
+
+            <article class="review-metric-card">
+              <div class="review-card-head">
+                <h2>有效答题数</h2>
+                <span class="status-badge" id="review-effective-rate">--</span>
+              </div>
+              <div class="review-metric-value"><strong id="review-answered-count">0</strong><span>道题</span></div>
+              <p>只有提交并生成有效点评的回答，才会进入本页统计。</p>
+            </article>
+
+            <article class="review-metric-card">
+              <div class="review-card-head">
+                <h2>主要失分原因</h2>
+                <span class="status-badge warning">Top 1</span>
+              </div>
+              <div class="review-metric-value"><strong id="review-top-issue-count">0</strong><span>次出现</span></div>
+              <p id="review-top-issue">暂无高频问题。</p>
+            </article>
+
+            <article class="review-metric-card">
+              <div class="review-card-head">
+                <h2>下一批优先练</h2>
+                <span class="status-badge">3 项以内</span>
+              </div>
+              <div class="review-metric-value"><strong id="review-next-focus-main">补强</strong><span>重点</span></div>
+              <p id="review-next-focus-copy">下一批题会围绕本轮暴露的问题生成。</p>
+            </article>
+          </section>
+
+          <section class="review-diagnosis-grid">
+            <article class="card review-panel">
+              <div class="review-card-head">
+                <div>
+                  <h2>主要失分原因</h2>
+                  <p>来自每道题点评后的问题标签统计。</p>
+                </div>
+                <span class="status-badge warning">按出现次数排序</span>
+              </div>
+              <div class="review-issue-list" id="review-issue-list"></div>
+            </article>
+
+            <article class="card review-panel">
+              <div class="review-card-head">
+                <div>
+                  <h2>能力短板排序</h2>
+                  <p>只展示最影响面试表现的前三项。</p>
+                </div>
+                <span class="status-badge danger">需优先补强</span>
+              </div>
+              <div class="review-priority-list" id="review-priority-list"></div>
+            </article>
+          </section>
+
+          <section class="review-middle-grid">
+            <article class="card review-panel">
+              <div class="review-card-head">
+                <div>
+                  <h2>答题质量分布</h2>
+                  <p>比单一平均分更能看出回答稳定性。</p>
+                </div>
+              </div>
+              <div class="review-quality-list" id="review-quality-list"></div>
+            </article>
+
+            <article class="card review-panel">
+              <div class="review-card-head">
+                <div>
+                  <h2>下一批练习依据</h2>
+                  <p>不是随机出题，而是根据本轮暴露的问题继续补短板。</p>
+                </div>
+                <span class="status-badge success">已生成方向</span>
+              </div>
+              <div class="review-reason-grid" id="review-reason-grid"></div>
+            </article>
+          </section>
+
+          <section class="review-answer-layout">
+            <article class="card review-panel">
+              <div class="review-card-head">
+                <div>
+                  <h2>答过的题</h2>
+                  <p>默认展示最近 10 条答题记录。</p>
+                </div>
+                <span class="status-badge" id="review-question-count">0 题</span>
+              </div>
+              <div class="review-question-list" id="review-question-list"></div>
+            </article>
+
+            <article class="card review-panel">
+              <div class="review-card-head">
+                <div>
+                  <h2>本题复盘详情</h2>
+                  <p>围绕选中的题目展示得分、问题和改进方向。</p>
+                </div>
+                <span class="status-badge warning" id="review-selected-status">建议复练</span>
+              </div>
+              <div class="review-detail-stats" id="review-detail-stats"></div>
+              <div class="review-detail-grid" id="review-detail-grid"></div>
+            </article>
+          </section>
+
+          <article class="review-bottom-action">
+            <button class="success-button practice-single" data-question="0" type="button">继续练习下一批题 →</button>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <aside class="docs-panel" id="docs-panel" aria-label="当前页面交互说明" aria-hidden="true">
+      <div class="docs-header">
+        <div>
+          <p class="eyebrow">Prototype Notes</p>
+          <h2 id="docs-title">职位分析页说明</h2>
+        </div>
+        <button class="icon-button" id="close-docs" type="button" aria-label="关闭说明">×</button>
+      </div>
+      <div class="docs-body" id="docs-body"></div>
+    </aside>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
